@@ -1,0 +1,9 @@
+"Trưởng phòng","position",0.25
+"Phó phòng","position",0.2
+"Phụ cấp độc hại","hazard",0.1
+"Bảo vệ","responsibility",0.05
+"Thủ kho","responsibility",0.15
+"Đối tượng khác","responsibility",0.1
+"Mức 1","region",0.05
+"Mức 2","region",0.1
+"Mức 3","region",0.5
