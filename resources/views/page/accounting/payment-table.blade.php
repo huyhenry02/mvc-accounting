@@ -7,9 +7,7 @@
         <th class="text-center" rowspan="2" width="12%">Họ và tên</th>
         <th class="text-center" rowspan="2">Ngày công thực tế</th>
         <th class="text-center" rowspan="2">Lương V1</th>
-        <th class="text-center" rowspan="2">Lương làm
-            thêm giờ
-        </th>
+        <th class="text-center" rowspan="2">Lương làm thêm giờ</th>
         <th colspan="4" class="text-center">Phụ cấp thưởng</th>
         <th class="text-center" rowspan="2">Bảo hiểm <br>
             (BHXH, BHYT, BHTN)
@@ -54,7 +52,7 @@
                     @php
                         $rate = $employee->allowances->where('type', $type)->sum('rate');
                     @endphp
-                    <td class="text-end">{{ number_format($rate * $payroll->unit_price_v1) }}</td>
+                    <td class="text-end">{{ number_format($rate * $employee->salary_basic) }}</td>
                 @endforeach
                 <td class="text-end">{{ number_format($bonus) }}</td>
                 @php

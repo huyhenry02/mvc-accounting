@@ -44,20 +44,6 @@ class AccountingController extends Controller
         return response($html);
     }
 
-    public function getUnitPrice(Request $request): JsonResponse
-    {
-        $month = $request->input('month');
-        $date = Carbon::createFromFormat('Y-m', $month);
-        $unitPriceV1 = Payroll::where('month', $date->month)
-            ->where('year', $date->year)
-            ->whereNotNull('unit_price_v1')
-            ->value('unit_price_v1') ?? 0;
-
-        return response()->json([
-            'unit_price_v1' => number_format($unitPriceV1)
-        ]);
-    }
-
     public function showPayment(Request $request): View|Factory|Application
     {
         $month = $request->input('month', now()->format('Y-m'));
@@ -71,22 +57,6 @@ class AccountingController extends Controller
         $data = $this->getDataAccountingTable($month);
 
         $html = view('page.accounting.payment-table', $data)->render();
-        return response($html);
-    }
-
-    public function showIndexTax(Request $request): View|Application|Factory
-    {
-        $month = $request->input('month', now()->format('Y-m'));
-        $data = $this->getDataTaxTable($month);
-        return view('page.accounting.tax', $data);
-    }
-
-    public function loadIndexTax(Request $request): Response
-    {
-        $month = $request->input('month', now()->format('Y-m'));
-        $data = $this->getDataTaxTable($month);
-
-        $html = view('page.accounting.tax-table', $data)->render();
         return response($html);
     }
 
@@ -139,8 +109,8 @@ class AccountingController extends Controller
             $month = $monthDate->month;
             $year = $monthDate->year;
             $employees = Employee::with(['allowances', 'deductions'])->get();
-            $unitPriceV1 = $request->input('unit_price_v1');
             foreach ($employees as $employee) {
+                $salaryBasic = $employee->salary_basic;
                 $period = CarbonPeriod::create("{$year}-{$month}-01", "{$year}-{$month}-" . $monthDate->daysInMonth);
                 $workingDaysRequired = collect($period)->filter(function ($item) {
                    return !in_array($item->dayOfWeek, [CarbonInterface::SATURDAY, CarbonInterface::SUNDAY], true);
@@ -153,10 +123,10 @@ class AccountingController extends Controller
 
                 $actualWorkingDays = $attendance ? $attendance->working_days : 0;
 
-                $salaryV1 = (int)($employee->salary_factor * $unitPriceV1 / $workingDaysRequired * $actualWorkingDays);
+                $salaryV1 = (int)($salaryBasic / $workingDaysRequired * $actualWorkingDays);
 
-                $totalAllowance = $employee->allowances->sum(function ($allowance) use ($unitPriceV1) {
-                    return $allowance->rate * $unitPriceV1;
+                $totalAllowance = $employee->allowances->sum(function ($allowance) use ($salaryBasic) {
+                    return $allowance->rate * $salaryBasic;
                 });
 
                 $totalDeduction = $employee->deductions->sum(function ($deduction) use ($salaryV1) {
@@ -179,7 +149,7 @@ class AccountingController extends Controller
 
                 $netBeforeTax = $salaryV1 + (int)$totalAllowance + (int)$workingShiftAmount + (int)$totalBonus - (int)$totalDeduction;
 
-                $arrayTax = $this->calculateTax($employee, $netBeforeTax);
+                $arrayTax = $this->calculateTax($netBeforeTax);
 
                 Payroll::updateOrCreate(
                     [
@@ -196,7 +166,6 @@ class AccountingController extends Controller
                         'net_salary_before_tax' => $netBeforeTax,
                         'net_salary_after_tax' => (int)$arrayTax['netAfterTax'],
                         'tax_amount' => (int)$arrayTax['taxCalculation'],
-                        'unit_price_v1' => $unitPriceV1
                     ]
                 );
             }
@@ -208,40 +177,12 @@ class AccountingController extends Controller
         }
     }
 
-    public function previewTaxPdf($month): Response
-    {
-        $data = $this->getDataTaxTable($month);
-        return PDF::loadView('page.template-download-file.tax', [
-            'data' => $data,
-        ])->setPaper('A4', 'landscape')->stream("BAO_CAO_THU_NHAP_THUE_CA_NHAN.pdf");
-    }
-
     public function previewPaymentPdf($month): Response
     {
         $data = $this->getDataAccountingTable($month);
         return PDF::loadView('page.template-download-file.payment', [
             'data' => $data,
         ])->setPaper('A4', 'landscape')->stream("BANG_THANH_TOAN_LUONG_" . $month . ".pdf");
-    }
-
-    private function getDataTaxTable(string $month): array
-    {
-        $date = Carbon::createFromFormat('Y-m', $month);
-        $monthInt = $date->month;
-        $year = $date->year;
-        $employees = Employee::with([
-            'position',
-            'allowances',
-            'deductions',
-            'payrolls' => function ($q) use ($monthInt, $year) {
-                $q->where('month', $monthInt)->where('year', $year);
-            },
-        ])->get();
-
-        return [
-            'employees' => $employees,
-            'month' => $month,
-        ];
     }
 
     private function getDataAccountingTable(string $month): array
@@ -270,18 +211,12 @@ class AccountingController extends Controller
             },
         ])->get();
 
-        $unitPriceV1 = Payroll::where('month', $monthInt)
-            ->where('year', $year)
-            ->whereNotNull('unit_price_v1')
-            ->value('unit_price_v1') ?? 0;
-
         return [
             'employees' => $employees,
             'allowances' => $allowances,
             'deductions' => $deductions,
             'workingDaysRequired' => $workingDaysRequired,
             'month' => $month,
-            'unitPriceV1' => $unitPriceV1
         ];
     }
 
@@ -297,43 +232,13 @@ class AccountingController extends Controller
         return compact('employees', 'bonuses', 'employeeBonuses', 'month');
     }
 
-    private function calculateTax($employee, $netBeforeTax): array
+    private function calculateTax($netBeforeTax): array
     {
-        if ($netBeforeTax - Payroll::TAX_SELF * $employee->number_of_dependent - Payroll::TAX_DEPENDENT > 0) {
-            if ($employee->number_of_dependent > 0 ){
-                $income = $netBeforeTax - Payroll::TAX_SELF * $employee->number_of_dependent - Payroll::TAX_DEPENDENT;
-            } else {
-                $income = $netBeforeTax - Payroll::TAX_DEPENDENT;
-            }
-            $taxBrackets = Payroll::getTaxBrackets();
-            $taxCalculation = 0;
-            $previousLimit = 0;
-            foreach ($taxBrackets as $bracket) {
-                if ($income > $bracket['limit']) {
-                    $taxable = $bracket['limit'] - $previousLimit;
-                } else {
-                    $taxable = $income - $previousLimit;
-                }
-
-                if ($taxable > 0) {
-                    $taxCalculation += $taxable * $bracket['rate'];
-                }
-
-                if ($income <= $bracket['limit']) {
-                    break;
-                }
-
-                $previousLimit = $bracket['limit'];
-            }
-            $netAfterTax = $netBeforeTax - (int)$taxCalculation;
-        } else {
-            $taxCalculation = 0;
-            $netAfterTax = $netBeforeTax;
-        }
+        $taxCalculation = $netBeforeTax / 100 * 10;
+        $netAfterTax = $netBeforeTax - $taxCalculation;
         return [
             'taxCalculation' => $taxCalculation,
             'netAfterTax' => $netAfterTax,
         ];
     }
-
 }

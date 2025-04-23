@@ -120,8 +120,8 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Hệ số lương</label>
-                                <input type="number" step="0.01" name="salary_factor" class="form-control" value="{{ $e->salary_factor }}">
+                                <label class="form-label">Lương cơ bản</label>
+                                <input type="number" step="0.01" name="salary_basic" class="form-control" value="{{ $e->salary_basic }}">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Thâm niên</label>

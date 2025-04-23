@@ -10,16 +10,8 @@
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                             <h6 id="headerMonth" class="mb-0">Bảng lương tháng</h6>
                             <div class="d-flex align-items-center gap-2 flex-wrap">
-                                <form action="{{ route('accounting.postPayrollTable') }}" method="POST" id="wageForm" class="d-flex align-items-center gap-2 mb-0">
-                                    @csrf
-                                    <h6 id="wageText" class="mb-0">Đơn giá lương V1: <strong id="wageAmount">{{ number_format($unitPriceV1)  }}VNĐ</strong></h6>
-                                    <input type="number" class="form-control" name="unit_price_v1" id="wageInput"
-                                           style="width: 150px; display: none;" value="{{ $unitPriceV1 }}">
-                                    <input type="hidden" id="monthPicker" value="" name="month">
-                                    <button type="button" class="btn btn-outline-secondary" id="btnEditWage">Sửa đơn giá</button>
-                                    <button type="submit" class="btn btn-outline-success" id="btnSaveWage" style="display: none;">Lưu</button>
-                                </form>
                                 <div class="position-relative d-inline-block">
+                                    <input type="hidden" id="monthPicker" value="" name="month">
                                     <button id="btnPickMonth" class="btn btn-outline-secondary">
                                         <i class="fas fa-calendar-alt"></i> Chọn
                                     </button>
@@ -86,12 +78,6 @@
                             .then(html => {
                                 document.getElementById('accountingTable').innerHTML = html;
                             });
-                        fetch(`/accounting/unit-price?month=${monthInput.value}`)
-                            .then(res => res.json())
-                            .then(data => {
-                                document.getElementById('wageAmount').textContent = data.unit_price_v1 + 'VNĐ';
-                                document.getElementById('wageInput').value = data.unit_price_v1.replaceAll(',', '');
-                            });
 
                     }
                     instance.close();
@@ -102,14 +88,5 @@
                 fp.open();
             });
         });
-    </script>
-    <script>
-        document.getElementById('btnEditWage').addEventListener('click', function () {
-            document.getElementById('wageText').style.display = 'none';
-            document.getElementById('wageInput').style.display = 'inline-block';
-            this.style.display = 'none';
-            document.getElementById('btnSaveWage').style.display = 'inline-block';
-        });
-
     </script>
 @endsection

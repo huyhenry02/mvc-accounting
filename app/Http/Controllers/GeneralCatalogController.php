@@ -144,7 +144,29 @@ class GeneralCatalogController extends Controller
                 'positions' => Position::all(),
             ]);
     }
+    public function postUser(Request $request): RedirectResponse
+    {
+        try {
+            DB::beginTransaction();
 
+            $input = $request->input();
+            $user = new User();
+            $user->fill($input);
+            $user->password = bcrypt($input['password']);
+            $user->save();
+
+            $employee = new Employee();
+            $employee->user_id = $user->id;
+            $employee->full_name = $input['full_name'];
+            $employee->employee_code = 'NV-' . str_pad($user->id, 4, '0', STR_PAD_LEFT);
+            $employee->save();
+            DB::commit();
+            return redirect()->route('general_catalog.showIndexEmployee')->with('success', 'Tạo người dùng thành công');
+        }catch (\Exception $exception){
+            DB::rollBack();
+            return redirect()->route('general_catalog.showIndexEmployee')->with('error', 'Tạo người dùng thất bại');
+        }
+    }
     public function putEmployee(Employee $employee, Request $request): RedirectResponse
     {
         try {
@@ -172,8 +194,8 @@ class GeneralCatalogController extends Controller
         $keySearch = $request->input('keySearch');
         $status = $request->input('status');
         $role = $request->input('role');
-        $department = $request->input('department');
-        $position = $request->input('position');
+        $department = $request->input('department_id');
+        $position = $request->input('position_id');
 
         $users = User::with('employee')
             ->when($keySearch, function ($query) use ($keySearch) {
@@ -185,7 +207,7 @@ class GeneralCatalogController extends Controller
             })
             ->when($status, function ($query, $status) {
                 return $query->whereHas('employee', function ($query) use ($status) {
-                    $query->where('status', $status);
+                    $query->where('employment_status', $status);
                 });
             })
             ->when($role, function ($query, $role) {
@@ -202,201 +224,5 @@ class GeneralCatalogController extends Controller
                 });
             })->paginate(10);
         return view('page.general_catalog.employee.index-table', compact('users'));
-    }
-
-    public function showIndexWorkingShift(): View|Factory|Application
-    {
-        $workingShifts = WorkingShift::all();
-        return view('page.general_catalog.working_shift.index', [
-            'workingShifts' => $workingShifts,
-        ]);
-    }
-
-    public function deleteWorkingShift(WorkingShift $workingShift): RedirectResponse
-    {
-        try {
-            DB::beginTransaction();
-            $workingShift->delete();
-            DB::commit();
-            return redirect()->route('general_catalog.showIndexWorkingShift')->with('success', 'Xóa ca làm việc thành công');
-        } catch (Exception $e) {
-            DB::rollBack();
-            return redirect()->route('general_catalog.showIndexWorkingShift')->with('error', 'Xóa ca làm việc thất bại');
-        }
-    }
-
-    public function putWorkingShift(WorkingShift $workingShift, Request $request): RedirectResponse
-    {
-        try {
-            DB::beginTransaction();
-            $input = $request->input();
-            $workingShift->fill($input);
-            $workingShift->save();
-            DB::commit();
-            return redirect()->route('general_catalog.showIndexWorkingShift')->with('success', 'Cập nhật ca làm việc thành công');
-        } catch (Exception $e) {
-            DB::rollBack();
-            return redirect()->route('general_catalog.showIndexWorkingShift')->with('error', 'Cập nhật ca làm việc thất bại');
-        }
-    }
-
-    public function showIndexDeduction(): View|Factory|Application
-    {
-        $deductions = Deduction::all();
-        return view('page.general_catalog.deduction.index', [
-            'deductions' => $deductions,
-        ]);
-    }
-
-    public function deleteDeduction(Deduction $deduction): RedirectResponse
-    {
-        try {
-            DB::beginTransaction();
-            $deduction->delete();
-            DB::commit();
-            return redirect()->route('general_catalog.showIndexDeduction')->with('success', 'Xóa khoản trích nộp theo lương thành công');
-        } catch (Exception $e) {
-            DB::rollBack();
-            return redirect()->route('general_catalog.showIndexDeduction')->with('error', 'Xóa khoản trích nộp theo lương thất bại');
-        }
-    }
-
-    public function putDeduction(Deduction $deduction, Request $request): RedirectResponse
-    {
-        try {
-            DB::beginTransaction();
-            $input = $request->input();
-            if (!empty($input['rate'])) {
-                $input['rate'] /= 100;
-            }
-            $deduction->fill($input);
-            $deduction->save();
-            DB::commit();
-            return redirect()->route('general_catalog.showIndexDeduction')->with('success', 'Cập nhật trích nộp theo lương thành công');
-        } catch (Exception $e) {
-            DB::rollBack();
-            return redirect()->route('general_catalog.showIndexDeduction')->with('error', 'Cập nhật trích nộp theo lương thất bại');
-        }
-    }
-
-    public function postDeduction(Request $request): RedirectResponse
-    {
-        try {
-            DB::beginTransaction();
-            $input = $request->input();
-            $input['rate'] /= 100;
-            $deduction = new Deduction();
-            $deduction->fill($input);
-            $deduction->save();
-            DB::commit();
-            return redirect()->route('general_catalog.showIndexDeduction')->with('success', 'Tạo trích nộp theo lương thành công');
-        } catch (Exception $e) {
-            DB::rollBack();
-            return redirect()->route('general_catalog.showIndexDeduction')->with('error', 'Tạo trích nộp theo lương thất bại');
-        }
-    }
-
-    public function showIndexAllowance(): View|Factory|Application
-    {
-        $allowances = Allowance::all();
-        return view('page.general_catalog.allowance.index', [
-            'allowances' => $allowances,
-        ]);
-    }
-
-    public function deleteAllowance(Allowance $allowance): RedirectResponse
-    {
-        try {
-            DB::beginTransaction();
-            $allowance->delete();
-            DB::commit();
-            return redirect()->route('general_catalog.showIndexAllowance')->with('success', 'Xóa khoản phụ cấp, trợ cấp thành công');
-        } catch (Exception $e) {
-            DB::rollBack();
-            return redirect()->route('general_catalog.showIndexAllowance')->with('error', 'Xóa khoản phụ cấp, trợ cấp thất bại');
-        }
-    }
-
-    public function putAllowance(Allowance $allowance, Request $request): RedirectResponse
-    {
-        try {
-            DB::beginTransaction();
-            $input = $request->input();
-            $allowance->fill($input);
-            $allowance->save();
-            DB::commit();
-            return redirect()->route('general_catalog.showIndexAllowance')->with('success', 'Cập nhật phụ cấp, trợ cấp thành công');
-        } catch (Exception $e) {
-            DB::rollBack();
-            return redirect()->route('general_catalog.showIndexAllowance')->with('error', 'Cập nhật phụ cấp, trợ cấp thất bại');
-        }
-    }
-
-    public function postAllowance(Request $request): RedirectResponse
-    {
-        try {
-            DB::beginTransaction();
-            $input = $request->input();
-            $allowance = new Allowance();
-            $allowance->fill($input);
-            $allowance->save();
-            DB::commit();
-            return redirect()->route('general_catalog.showIndexAllowance')->with('success', 'Tạo phụ cấp, trợ cấp thành công');
-        } catch (Exception $e) {
-            DB::rollBack();
-            return redirect()->route('general_catalog.showIndexAllowance')->with('error', 'Tạo phụ cấp, trợ cấp thất bại');
-        }
-    }
-
-    public function showIndexBonus(): View|Factory|Application
-    {
-        $bonuses = Bonus::all();
-        return view('page.general_catalog.bonus.index', [
-            'bonuses' => $bonuses,
-        ]);
-    }
-
-    public function deleteBonus(Bonus $bonus): RedirectResponse
-    {
-        try {
-            DB::beginTransaction();
-            $bonus->delete();
-            DB::commit();
-            return redirect()->route('general_catalog.showIndexBonus')->with('success', 'Xóa khoản thưởng nhân viên thành công');
-        } catch (Exception $e) {
-            DB::rollBack();
-            return redirect()->route('general_catalog.showIndexBonus')->with('error', 'Xóa khoản thưởng nhân viên thất bại');
-        }
-    }
-
-    public function putBonus(Bonus $bonus, Request $request): RedirectResponse
-    {
-        try {
-            DB::beginTransaction();
-            $input = $request->input();
-            $bonus->fill($input);
-            $bonus->save();
-            DB::commit();
-            return redirect()->route('general_catalog.showIndexBonus')->with('success', 'Cập nhật thưởng nhân viên thành công');
-        } catch (Exception $e) {
-            DB::rollBack();
-            return redirect()->route('general_catalog.showIndexBonus')->with('error', 'Cập nhật thưởng nhân viên thất bại');
-        }
-    }
-
-    public function postBonus(Request $request): RedirectResponse
-    {
-        try {
-            DB::beginTransaction();
-            $input = $request->input();
-            $bonus = new Bonus();
-            $bonus->fill($input);
-            $bonus->save();
-            DB::commit();
-            return redirect()->route('general_catalog.showIndexBonus')->with('success', 'Tạo thưởng nhân viên thành công');
-        } catch (Exception $e) {
-            DB::rollBack();
-            return redirect()->route('general_catalog.showIndexBonus')->with('error', 'Tạo thưởng nhân viên thất bại');
-        }
     }
 }

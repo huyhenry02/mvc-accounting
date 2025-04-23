@@ -1,9 +1,9 @@
-"Trưởng phòng","position",0.25
-"Phó phòng","position",0.2
-"Phụ cấp độc hại","hazard",0.1
-"Bảo vệ","responsibility",0.05
-"Thủ kho","responsibility",0.15
-"Đối tượng khác","responsibility",0.1
-"Mức 1","region",0.05
-"Mức 2","region",0.1
-"Mức 3","region",0.5
+"Trưởng nhóm kỹ thuật","position",0.25
+"Phó nhóm kỹ thuật","position",0.2
+"Phụ cấp làm việc môi trường đặc biệt","hazard",0.1
+"Phụ cấp trực hệ thống","responsibility",0.05
+"Phụ cấp quản lý kho thiết bị","responsibility",0.15
+"Phụ cấp hỗ trợ triển khai dự án","responsibility",0.1
+"Phụ cấp làm việc tại văn phòng vệ tinh","region",0.05
+"Phụ cấp làm việc từ xa (remote zone 2)","region",0.1
+"Phụ cấp onsite nước ngoài","region",0.5

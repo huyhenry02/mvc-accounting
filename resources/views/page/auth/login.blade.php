@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Đăng nhập hệ thống Agribank</title>
+    <title>Đăng nhập hệ thống quản lý</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
     <style>
         * {
@@ -13,7 +13,7 @@
         }
 
         body {
-            background: linear-gradient(to bottom right, #f8f2f2, #fdfdfd);
+            background: linear-gradient(to bottom right, #e8f1f8, #f7fafd);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -22,21 +22,33 @@
 
         .login-wrapper {
             background-color: #fff;
-            padding: 40px 30px;
             border-radius: 12px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
             width: 400px;
+            overflow: hidden;
         }
 
-        .agribank-logo {
+        .login-header {
+            background-color: #0a5a97;
+            padding: 20px;
             text-align: center;
-            margin-bottom: 25px;
         }
 
-        .agribank-logo img {
-            width: 240px;
-            height: 32px;
+        .login-header img {
+            max-height: 60px;
             object-fit: contain;
+            margin-bottom: 5px;
+        }
+
+        .login-header .logo-text {
+            color: #fff;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 1px;
+        }
+
+        .login-body {
+            padding: 30px;
         }
 
         h3 {
@@ -44,7 +56,7 @@
             font-size: 22px;
             font-weight: 600;
             margin-bottom: 25px;
-            color: #4b1c1c;
+            color: #0a5a97;
         }
 
         label {
@@ -66,13 +78,13 @@
 
         input:focus {
             outline: none;
-            border-color: #b22222;
+            border-color: #0a5a97;
         }
 
         button {
             width: 100%;
             padding: 12px;
-            background-color: #b22222;
+            background-color: #0a5a97;
             color: white;
             border: none;
             border-radius: 6px;
@@ -83,43 +95,30 @@
         }
 
         button:hover {
-            background-color: #991a1a;
-        }
-
-        .forgot-password {
-            text-align: center;
-            margin-top: 15px;
-        }
-
-        .forgot-password a {
-            color: #b22222;
-            text-decoration: none;
-            font-size: 13px;
-        }
-
-        .forgot-password a:hover {
-            text-decoration: underline;
+            background-color: #08487b;
         }
     </style>
 </head>
 <body>
 
 <div class="login-wrapper">
-    <div class="agribank-logo">
-        <img src="/assets/img/logo.svg" alt="Agribank Logo">
+    <div class="login-header">
+        <img src="/assets/img/LOGO.png" alt="Corp Logo">
     </div>
-    <h3>Đăng nhập hệ thống nội bộ</h3>
 
-    <form action="{{ route('auth.postLogin') }}" method="post">
-        @csrf
-        <label for="email">Email</label>
-        <input type="email" id="email" placeholder="Nhập email của bạn" name="email" required>
+    <div class="login-body">
+        <h3>Đăng nhập hệ thống quản lý</h3>
+        <form action="{{ route('auth.postLogin') }}" method="post">
+            @csrf
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Nhập email của bạn" name="email" required>
 
-        <label for="password">Mật khẩu</label>
-        <input type="password" id="password" placeholder="Nhập mật khẩu" name="password" required>
+            <label for="password">Mật khẩu</label>
+            <input type="password" id="password" placeholder="Nhập mật khẩu" name="password" required>
 
-        <button type="submit">Tiếp tục</button>
-    </form>
+            <button type="submit">Tiếp tục</button>
+        </form>
+    </div>
 </div>
 </body>
 </html>

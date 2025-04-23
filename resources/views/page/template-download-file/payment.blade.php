@@ -107,8 +107,8 @@
 <table class="header-table">
     <tr>
         <td class="center">
-            <div class="bold">NGÂN HÀNG AGRIBANK VIỆT NAM</div>
-            <div class="bold"> Chi nhánh:</div>
+            <div class="bold">Công ty TNHH Công nghệ Hoa Sơn</div>
+            <div class="bold"> Chi nhánh: Hà nội</div>
         </td>
         <td class="right">
             <div class="bold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
@@ -195,7 +195,7 @@
                     @php
                         $rate = $employee->allowances->where('type', $type)->sum('rate');
                     @endphp
-                    <td class="text-end">{{ number_format($rate * $payroll->unit_price_v1) }}</td>
+                    <td class="text-end">{{ number_format($rate * $employee->salary_basic) }}</td>
                 @endforeach
 
                 <td class="text-end">{{ number_format($bonus) }}</td>
@@ -234,7 +234,7 @@
         <td></td>
         <td></td>
         <td style="text-align: center;">
-            Nam Định, ngày {{ Carbon::now()->format('d') }} tháng {{ Carbon::now()->format('m') }} năm {{ Carbon::now()->format('Y') }}<br>
+            Hà nội, ngày {{ Carbon::now()->format('d') }} tháng {{ Carbon::now()->format('m') }} năm {{ Carbon::now()->format('Y') }}<br>
         </td>
     </tr>
     <tr>

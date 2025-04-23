@@ -5,10 +5,9 @@
         <div class="logo-header">
             <a href="#" class="logo">
                 <img
-                    src="/assets/img/logo.svg"
+                    src="/assets/img/LOGO.png"
                     alt="navbar brand"
                     class="navbar-brand"
-                    height="20"
                 />
             </a>
             <div class="nav-toggle">
@@ -28,7 +27,7 @@
     <!-- Navbar Header -->
     <nav
         class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom"
-        style="background-color: #a01f23"
+        style="background-color: #0a5a97"
     >
         <div class="container-fluid">
             @php
@@ -53,21 +52,6 @@
                         @case('general_catalog.showUpdateEmployee')
                             Cập nhật nhân viên
                             @break
-                        @case('general_catalog.showIndexWorkingShift')
-                            Danh sách ca làm việc
-                            @break
-                        @case('general_catalog.showIndexDeduction')
-                            Danh sách khấu trừ
-                            @break
-                        @case('general_catalog.showIndexAllowance')
-                            Danh sách phụ cấp
-                            @break
-                        @case('general_catalog.showIndexBonus')
-                            Danh sách khoản thưởng
-                            @break
-                        @case('system.showIndexUser')
-                            Danh sách người dùng
-                            @break
                         @case('allowance_deduction.showIndexDeduction')
                             Bảng tổng hợp trích nộp
                             @break
@@ -83,23 +67,14 @@
                         @case('attendance.showOvertime')
                             Danh sách ca làm thêm
                             @break
-                        @case('attendance.showPersonal')
-                            Bảng công cá nhân
-                            @break
                         @case('accounting.showEmployeeBonus')
                             Thương nhân viên
                             @break
                         @case('accounting.showIndex')
                             Bảng lương
                             @break
-                        @case('accounting.showIndexTax')
-                            Bảng thuế
-                            @break
                         @case('accounting.showPayment')
                             Bảng thanh toán lương
-                            @break
-                        @case('journal.showJournal')
-                            Hạch toán
                             @break
                     @endswitch
                 </h3>
@@ -113,18 +88,18 @@
                         <i class="icon-arrow-right"></i>
                     </li>
                     <li class="nav-item" style="color: #fff">
-                        @if ( Str::startsWith($routeName, 'general_catalog'))
-                            <a href="{{ route('general_catalog.showIndexEmployee') }}" style="color: #fff">Danh mục chung</a>
-                        @elseif ( Str::startsWith($routeName, 'system'))
-                            <a href="{{ route('system.showIndexUser') }}" style="color: #fff">Quản trị hệ thống</a>
+                        @if ( Route::currentRouteName() === 'general_catalog.showIndexEmployee')
+                            <a href="{{ route('general_catalog.showIndexEmployee') }}" style="color: #fff">Quản lý nhân viên</a>
+                        @elseif ( Route::currentRouteName() === 'general_catalog.showIndexDepartment')
+                            <a href="{{ route('general_catalog.showIndexDepartment') }}" style="color: #fff">Quản lý phòng ban</a>
+                        @elseif ( Route::currentRouteName() === 'general_catalog.showIndexPosition')
+                            <a href="{{ route('general_catalog.showIndexPosition') }}" style="color: #fff">Quản lý chức vụ</a>
                         @elseif ( Str::startsWith($routeName, 'allowance_deduction'))
                             <a href="{{ route('allowance_deduction.showIndexDeduction') }}" style="color: #fff">Trích nộp và phụ cấp</a>
                         @elseif ( Str::startsWith($routeName, 'attendance'))
                             <a href="{{ route('attendance.showDetailAttendance') }}" style="color: #fff"> Quản lý chấm công </a>
                         @elseif ( Str::startsWith($routeName, 'accounting'))
                             <a href="{{ route('accounting.showIndex') }}" style="color: #fff"> Tính lương và thanh toán </a>
-                        @elseif ( Str::startsWith($routeName, 'journal'))
-                            <a href="{{ route('journal.showJournal') }}" style="color: #fff"> Hạch toán </a>
                         @endif
                     </li>
                     <li class="separator">
@@ -142,21 +117,6 @@
                             @case('general_catalog.showUpdateEmployee')
                                 <a href="{{ route('general_catalog.showIndexEmployee') }}" style="color: #fff">Nhân viên</a>
                                 @break
-                            @case('general_catalog.showIndexWorkingShift')
-                                <a href="{{ route('general_catalog.showIndexWorkingShift') }}" style="color: #fff">Ca làm thêm</a>
-                                @break
-                            @case('general_catalog.showIndexDeduction')
-                                <a href="{{ route('general_catalog.showIndexDeduction') }}" style="color: #fff">Trích nộp theo lương</a>
-                                @break
-                            @case('general_catalog.showIndexAllowance')
-                                <a href="{{ route('general_catalog.showIndexAllowance') }}" style="color: #fff">Phụ cấp và trợ cấp</a>
-                                @break
-                            @case('general_catalog.showIndexBonus')
-                                <a href="{{ route('general_catalog.showIndexBonus') }}" style="color: #fff">Thưởng</a>
-                                @break
-                            @case('system.showIndexUser')
-                                <a href="{{ route('system.showIndexUser') }}" style="color: #fff">Người dùng</a>
-                                @break
                             @case('allowance_deduction.showIndexDeduction')
                                 <a href="{{ route('allowance_deduction.showIndexDeduction') }}" style="color: #fff">Trích nộp</a>
                                 @break
@@ -172,9 +132,6 @@
                             @case('attendance.showOvertime')
                                 <a href="#" style="color: #fff">Làm thêm giờ</a>
                                 @break
-                            @case('attendance.showPersonal')
-                                <a href="#" style="color: #fff">Cá nhân</a>
-                                @break
                             @case('accounting.showIndex')
                             @case('accounting.showPayment')
 
@@ -182,12 +139,6 @@
                                 @break
                             @case('accounting.showEmployeeBonus')
                                 <a href="#" style="color: #fff">Thưởng </a>
-                                @break
-                            @case('accounting.showIndexTax')
-                                <a href="#" style="color: #fff">Thuế </a>
-                                @break
-                            @case('journal.showJournal')
-                                <a href="#" style="color: #fff">Bảng hạch toán </a>
                                 @break
                         @endswitch
                     </li>

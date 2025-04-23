@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('total_deduction')->comment('Tổng khoản trích');
             $table->integer('total_bonus')->default(0)->comment('Tổng khoản thưởng');
             $table->integer('working_shift_amount')->default(0)->comment('Tổng tiền ca làm thêm');
-            $table->integer('tax_amount')->default(0)->comment('Tổng thuế thu nhập cá nhân');
+            $table->integer('tax_amount')->default(0)->comment('Thuế thu nhập cá nhân');
             $table->integer('net_salary_before_tax')->default(0)->comment('Lương thực lĩnh trước thuế');
             $table->integer('net_salary_after_tax')->default(0)->comment('Lương thực lĩnh sau thuế');
             $table->timestamps();

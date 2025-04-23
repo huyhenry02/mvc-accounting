@@ -75,32 +75,6 @@ class AttendanceController extends Controller
         return view('page.attendance.overtime', compact('overtimes', 'month', 'workingShifts'));
     }
 
-    public function showPersonal(string $month): View|Factory|Application
-    {
-        $user = auth()->user();
-        $date = Carbon::createFromFormat('Y-m', $month);
-        $daysInMonth = $date->daysInMonth;
-
-        $dayWork = collect(range(1, $daysInMonth))->map(function ($day) use ($date) {
-            return $date->copy()->day($day);
-        })->reject(function ($d) {
-            return $d->isWeekend();
-        })->count();
-
-        $attendanceData = AttendanceDetail::where('employee_id', $user->employee->id)
-            ->whereMonth('work_date', $date->month)
-            ->whereYear('work_date', $date->year)
-            ->where('is_overtime', false)
-            ->get();
-
-        $workingDays = $attendanceData->count();
-        $leaveDays = $dayWork - $workingDays;
-
-        return view('page.attendance.personal', compact(
-            'month', 'attendanceData', 'workingDays', 'leaveDays', 'dayWork'
-        ));
-    }
-
     private function getDetailAttendanceData(string $month): array
     {
         $date = Carbon::createFromFormat('Y-m', $month);

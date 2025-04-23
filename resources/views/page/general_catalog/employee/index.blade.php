@@ -37,7 +37,7 @@
                     </div>
                     <div class="col-md-4 mt-3">
                         <label class="form-label">Phòng ban:</label>
-                        <select class="form-control" id="department" name="department">
+                        <select class="form-control" id="department_id" name="department_id">
                             <option value="">Chọn phòng ban</option>
                             @foreach( $departments as $key => $department)
                                 <option value="{{ $department->id }}">{{ $department->name }}</option>
@@ -46,7 +46,7 @@
                     </div>
                     <div class="col-md-4 mt-3">
                         <label class="form-label">Chức vụ:</label>
-                        <select class="form-control" id="position" name="position">
+                        <select class="form-control" id="position_id" name="position_id">
                             <option value="">Chọn chức vụ</option>
                             @foreach( $positions as $key => $position)
                                 <option value="{{ $position->id }}">{{ $position->name }}</option>
@@ -62,6 +62,14 @@
                     <div class="card-header">
                         <div class="d-flex align-items-center">
                             <h6>Danh sách nhân viên</h6>
+                            <button
+                                class="btn btn-primary btn-round ms-auto"
+                                data-bs-toggle="modal"
+                                data-bs-target="#createUserModal"
+                            >
+                                <i class="fa fa-plus"></i>
+                                Thêm nhân viên
+                            </button>
                         </div>
                     </div>
                     <div class="card-body">
@@ -122,7 +130,7 @@
                                                 data-contract-type="{{ $employee->contract_type ?? '' }}"
                                                 data-status="{{ $employee->employment_status ? Employee::STATUS_LIST[$employee->employment_status] : '' }}"
                                                 data-base-salary="{{ $employee->base_salary ?? '' }}"
-                                                data-factor="{{ $employee->salary_factor ?? '' }}"
+                                                data-factor="{{ $employee->salary_basic ? number_format($employee->salary_basic) : '' }}"
                                                 data-seniority="{{ $employee->seniority ?? '' }}"
                                                 data-tax-code="{{ $employee->tax_code ?? '' }}"
                                                 data-bank-account="{{ $employee->bank_account ?? '' }}"
@@ -152,6 +160,7 @@
         </div>
     </div>
     @include('page.general_catalog.employee.detail')
+    @include('page.general_catalog.employee.create')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).on('click', '.btn-view-employee', function () {
@@ -186,11 +195,12 @@
     </script>
     <script>
         $(document).ready(function() {
-            $('#search-input, #status, #position, #department, #role').on('input', function () {
+            $('#search-input, #status, #position_id, #department_id, #role').on('input', function () {
                 var keySearch = $('#search-input').val();
                 var status = $('#status').val();
-                var position = $('#position').val();
-                var department = $('#department').val();
+                var position_id = $('#position_id').val();
+                var department_id = $('#department_id').val();
+                console.log('department_id', department_id)
                 var role = $('#role').val();
                 $.ajax({
                     url: '{{ route('general_catalog.searchEmployee') }}',
@@ -198,8 +208,8 @@
                     data: {
                         keySearch: keySearch,
                         status: status,
-                        position: position,
-                        department: department,
+                        position_id: position_id,
+                        department_id: department_id,
                         role: role,
                     },
                     success: function (response) {

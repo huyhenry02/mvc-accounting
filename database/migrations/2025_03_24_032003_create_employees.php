@@ -28,7 +28,7 @@ return new class extends Migration {
             $table->date('start_date')->nullable()->comment('Ngày vào làm');
             $table->enum('employment_status', ['working', 'resigned'])->default('working')->comment('Tình trạng làm việc');
             $table->string('contract_type')->nullable()->comment('Loại hợp đồng');
-            $table->float('salary_factor')->nullable()->comment('Hệ số lương');
+            $table->float('salary_basic')->nullable()->comment('Lương cơ bản');
             $table->integer('seniority')->default(0)->comment('Thâm niên (năm)');
             $table->string('tax_code')->nullable()->comment('Mã số thuế cá nhân');
             $table->string('bank_account')->nullable()->comment('Số tài khoản ngân hàng');
